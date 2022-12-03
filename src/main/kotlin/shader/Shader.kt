@@ -20,7 +20,7 @@ abstract class Shader(shader: String) : Destroyable {
     private var matrixBuffer = BufferUtils.createFloatBuffer(16)
 
     init {
-        val glslPreprocessor = GlslPreprocessor()
+        val glslPreprocessor = GLSLPreprocessor()
 
         vertex = loadShader(
             """

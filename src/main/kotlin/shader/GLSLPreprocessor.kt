@@ -1,7 +1,7 @@
 package shader
 
 // Yes, I made custom preprocessor for shaders, I am not mad, am I?
-class GlslPreprocessor {
+class GLSLPreprocessor {
     fun process(shader: String): String {
         val out = StringBuilder()
         val lines = shader.split("\\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
