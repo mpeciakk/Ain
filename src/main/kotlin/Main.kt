@@ -1,3 +1,6 @@
+import mesh.*
+import org.joml.Vector2f
+import org.joml.Vector3f
 import org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray
 import org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays
 import org.lwjgl.opengl.GL15.*
@@ -37,52 +40,75 @@ out_Color = vec4(1, 1, 1, 1);
     }
 }
 
+class TestMeshFactory : MeshFactory() {
+    override fun processMesh(meshBuilder: MeshBuilder, mesh: Mesh): Mesh {
+        mesh.bind()
+
+        val vertices = mesh.getVbo(0, 3)
+        val indices = mesh.addVbo(IndicesVBO())
+
+        val meshVertices = meshBuilder.vertices
+        val meshIndices = meshBuilder.indices
+
+        val verticesData = FloatArray(meshVertices.size * 3)
+        val uvsData = FloatArray(meshVertices.size * 2)
+        val normalsData = FloatArray(meshVertices.size * 3)
+        val indicesData = meshIndices.toTypedArray()
+
+        var verticesIndex = 0
+        var uvsIndex = 0
+
+        for (vertex in meshVertices) {
+            verticesData[verticesIndex++] = vertex.position.x
+            verticesData[verticesIndex++] = vertex.position.y
+            verticesData[verticesIndex++] = vertex.position.z
+            uvsData[uvsIndex++] = vertex.uvs.x
+            uvsData[uvsIndex++] = vertex.uvs.y
+        }
+
+        vertices.flush(getFloatBuffer(verticesData))
+        indices.flush(getIntBuffer(indicesData.toIntArray()))
+
+        mesh.elementsCount = indicesData.size
+
+        mesh.unbind()
+
+        return mesh
+    }
+}
+
 fun main(args: Array<String>) {
     val window = Window(800, 600, "Ain engine")
     window.create()
 
-    val vertices = floatArrayOf(
-        -0.5f,  0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.5f,  0.5f, 0.0f,
-    )
-
-    val indices = intArrayOf(
-        0, 1, 3,
-        3, 1, 2,
-    )
-
     val shader = TestShader()
+    val factory = TestMeshFactory()
 
-    val verticesBuffer = MemoryUtil.memAllocFloat(vertices.size)
-    verticesBuffer.put(vertices).flip()
+    val builder = MeshBuilder()
 
-    val vao = glGenVertexArrays();
-    glBindVertexArray(vao);
+    builder.drawQuad(
+        Vertex(Vector3f(-0.5f, 0.0f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
+        Vertex(Vector3f(0.5f, 0.0f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
+        Vertex(Vector3f(-0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
+        Vertex(Vector3f(0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f))
+    )
 
-    val vbo = glGenBuffers();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+    builder.drawQuad(
+        Vertex(Vector3f(-0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
+        Vertex(Vector3f(0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
+        Vertex(Vector3f(-0.5f, 1f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
+        Vertex(Vector3f(0.5f, 1f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f))
+    )
 
-    val idxVbo = glGenBuffers();
-    val indicesBuffer = MemoryUtil.memAllocInt(indices.size);
-    indicesBuffer.put(indices).flip();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idxVbo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glBindVertexArray(0);
+    val mesh = factory.processMesh(builder)
 
     while (!window.shouldClose) {
         shader.start()
 
-        glBindVertexArray(vao);
+        glBindVertexArray(mesh.vao);
         glEnableVertexAttribArray(0);
 
-        glDrawElements(GL_TRIANGLES, indices.size, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, mesh.elementsCount, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(0);
         glBindVertexArray(0);
