@@ -2,9 +2,12 @@ package shader
 
 import Destroyable
 import org.joml.Matrix4f
+import org.joml.Vector3f
+import org.joml.Vector3i
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL20.*
 import kotlin.system.exitProcess
+
 
 abstract class Shader(shader: String) : Destroyable {
     private var program: Int
@@ -38,27 +41,10 @@ abstract class Shader(shader: String) : Destroyable {
         bindAttributes();
         glLinkProgram(program);
         glValidateProgram(program);
-
-//        program = gl.createProgram()
-//        glError("createProgram")
-//        program.attach(vertex)
-//        program.attach(fragment)
-//        glError("attach")
-//        bindAttributes()
-//        glError("bindAttributes")
-//        program.link()
-//        glError("link")
-//        program.validate()
-//        glError("validate")
-
-
     }
 
     private fun loadShader(source: String, type: Int): Int {
         val shader = glCreateShader(type)
-
-//        shader.source(source)
-//        shader.compile()
 
         glShaderSource(shader, source);
         glCompileShader(shader);
@@ -73,12 +59,10 @@ abstract class Shader(shader: String) : Destroyable {
     }
 
     fun start() {
-//        program.use()
         glUseProgram(program)
     }
 
     fun stop() {
-//        program.unuse()
         glUseProgram(0)
     }
 
@@ -93,44 +77,42 @@ abstract class Shader(shader: String) : Destroyable {
     }
 
     fun loadTransformationMatrix(matrix: Matrix4f) {
-//        loadMatrix("transformationMatrix", matrix)
+        loadMatrix("transformationMatrix", matrix)
     }
 
     fun loadProjectionMatrix(matrix: Matrix4f) {
-//        loadMatrix("projectionMatrix", matrix)
+        loadMatrix("projectionMatrix", matrix)
     }
 
     fun loadViewMatrix(matrix: Matrix4f) {
-//        loadMatrix("viewMatrix", matrix)
+        loadMatrix("viewMatrix", matrix)
     }
 
-//    fun loadFloat(name: String, value: Float) {
-//        program.programUniform(getUniformLocation(name), value)
-//    }
-//
-//    fun loadInt(name: String, value: Int) {
-//        program.programUniform(getUniformLocation(name), value)
-//    }
-//
-//    fun loadVector(name: String, vector: Vector3f) {
-//        program.programUniform(getUniformLocation(name), vector.x, vector.y, vector.z)
-//    }
-//
-//    fun loadVector(name: String, vector: Vector3i) {
-//        program.programUniform(getUniformLocation(name), vector.x, vector.y, vector.z)
-//    }
-//
-//    fun loadBoolean(name: String, value: Boolean) {
-//        program.programUniform(getUniformLocation(name), if (value) 1 else 0)
-//    }
-//
-//    fun loadMatrix(name: String, matrix: Mat4d) {
-////        matrixBuffer = matrix.get(matrixBuffer)
-//        program.programUniform(getUniformLocation(name), matrix)
-////        program.program
-////        matrixBuffer.clear()
-//    }
+    fun loadFloat(name: String, value: Float) {
+        glUniform1f(getUniformLocation(name), value)
+    }
 
+    fun loadInt(name: String, value: Int) {
+        glUniform1i(getUniformLocation(name), value)
+    }
+
+    fun loadVector(name: String, vector: Vector3f) {
+        glUniform3f(getUniformLocation(name), vector.x, vector.y, vector.z)
+    }
+
+    fun loadVector(name: String, vector: Vector3i) {
+        glUniform3i(getUniformLocation(name), vector.x, vector.y, vector.z)
+    }
+
+    fun loadBoolean(name: String, value: Boolean) {
+        glUniform1f(getUniformLocation(name), (if (value) 1 else 0).toFloat())
+    }
+
+    fun loadMatrix(name: String, matrix: Matrix4f) {
+        matrixBuffer = matrix[matrixBuffer]
+        glUniformMatrix4fv(getUniformLocation(name), false, matrixBuffer)
+        matrixBuffer.clear()
+    }
     protected abstract fun bindAttributes()
 
     protected fun bindAttribute(attribute: Int, name: String) {
@@ -139,10 +121,10 @@ abstract class Shader(shader: String) : Destroyable {
 
     override fun destroy() {
         stop()
-//        program.detach(vertex)
-//        program.detach(fragment)
-//        vertex.delete()
-//        fragment.delete()
-//        program.delete()
+        glDetachShader(program, vertex)
+        glDetachShader(program, fragment)
+        glDeleteShader(vertex)
+        glDeleteShader(fragment)
+        glDeleteProgram(program)
     }
 }

@@ -3,7 +3,7 @@ import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
 import org.lwjgl.system.MemoryStack
 
-class Window(width: Int, height: Int, title: String) : Destroyable {
+class Window(val width: Int, val height: Int, title: String) : Destroyable {
     private val id: Long
 
     var shouldClose: Boolean
