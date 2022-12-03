@@ -1,15 +1,10 @@
+import ain.render.Renderable
 import mesh.*
-import org.joml.Vector2f
-import org.joml.Vector3f
-import org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray
-import org.lwjgl.opengl.ARBVertexArrayObject.glGenVertexArrays
 import org.lwjgl.opengl.GL15.*
 import org.lwjgl.opengl.GL20.*
-import org.lwjgl.system.MemoryUtil
+import rp.MeshRenderer
+import rp.RenderPipeline
 import shader.Shader
-import java.nio.FloatBuffer
-
-
 
 
 class TestShader : Shader(
@@ -77,6 +72,57 @@ class TestMeshFactory : MeshFactory() {
     }
 }
 
+//class Chunk : SingleMeshHolder() {
+//    override fun rebuild() {
+//        builder.drawQuad(
+//            Vertex(0f, 0f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+//            Vertex(1f, 0f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+//            Vertex(0f, 1f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+//            Vertex(1f, 1f, 0f, 0f, 0f, null, 0f, 0f, 0f)
+//        )
+//    }
+//}
+
+class Chunk : Renderable() {
+    override fun rebuild() {
+        getBuilder("first").drawQuad(
+            Vertex(0f, 0f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+            Vertex(0.1f, 0f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+            Vertex(0f, 1f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+            Vertex(0.1f, 1f, 0f, 0f, 0f, null, 0f, 0f, 0f)
+        )
+
+        getBuilder("second").drawQuad(
+            Vertex(0.2f, 0f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+            Vertex(0.3f, 0f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+            Vertex(0.2f, 1f, 0f, 0f, 0f, null, 0f, 0f, 0f),
+            Vertex(0.3f, 1f, 0f, 0f, 0f, null, 0f, 0f, 0f)
+        )
+    }
+}
+
+class TestRenderPipeline : RenderPipeline(TestShader(), TestMeshFactory()) {
+    override fun render(mesh: Mesh) {
+        shader.start()
+
+        mesh.bind()
+        mesh.vbos.forEach {
+            glEnableVertexAttribArray(it.attributeNumber)
+        }
+
+        glDrawElements(GL_TRIANGLES, mesh.elementsCount, GL_UNSIGNED_INT, 0);
+
+        mesh.vbos.forEach {
+            glDisableVertexAttribArray(it.attributeNumber)
+        }
+        mesh.unbind()
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+
+        shader.stop()
+    }
+}
+
 fun main(args: Array<String>) {
     val window = Window(800, 600, "Ain engine")
     window.create()
@@ -84,36 +130,14 @@ fun main(args: Array<String>) {
     val shader = TestShader()
     val factory = TestMeshFactory()
 
-    val builder = MeshBuilder()
+    val chunk = Chunk()
+    val renderer = MeshRenderer<Chunk>(TestRenderPipeline())
+    chunk.markDirty()
 
-    builder.drawQuad(
-        Vertex(Vector3f(-0.5f, 0.0f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(0.5f, 0.0f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(-0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f))
-    )
-
-    builder.drawQuad(
-        Vertex(Vector3f(-0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(0.5f, 0.5f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(-0.5f, 1f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f)),
-        Vertex(Vector3f(0.5f, 1f, 0.0f), Vector2f(0.0f, 0.0f), null, Vector3f(0.0f, 0.0f, 0.0f))
-    )
-
-    val mesh = factory.processMesh(builder)
+//    val mesh = factory.processMesh(builder)
 
     while (!window.shouldClose) {
-        shader.start()
-
-        glBindVertexArray(mesh.vao);
-        glEnableVertexAttribArray(0);
-
-        glDrawElements(GL_TRIANGLES, mesh.elementsCount, GL_UNSIGNED_INT, 0);
-
-        glDisableVertexAttribArray(0);
-        glBindVertexArray(0);
-
-        shader.stop()
+        renderer.render(chunk)
 
         window.update()
     }
