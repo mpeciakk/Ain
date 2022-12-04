@@ -33,9 +33,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 
-//    implementation("kotlin.graphics:gln:0.5.31")
-//    implementation("kotlin.graphics:glm:0.9.9.1-5")
-
     implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
 
     implementation("org.joml:joml:1.9.2")

@@ -1,10 +1,14 @@
-import ain.render.Renderable
+import rp.Renderable
 import mesh.IndicesVBO
 import mesh.Mesh
 import mesh.MeshBuilder
 import mesh.MeshFactory
 import org.joml.Matrix4f
-import org.lwjgl.opengl.GL20.*
+import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER
+import org.lwjgl.opengl.GL15.glBindBuffer
+import org.lwjgl.opengl.GL20.glDisableVertexAttribArray
+import org.lwjgl.opengl.GL20.glEnableVertexAttribArray
 import rp.MeshRenderer
 import rp.RenderPipeline
 import shader.Shader
@@ -111,7 +115,7 @@ class TestRenderPipeline : RenderPipeline(TestShader(), TestMeshFactory()) {
             }
         }
 
-    override fun render(mesh: Mesh) {
+    override fun render(obj: Renderable, mesh: Mesh) {
         shader.start()
 
         shader.loadProjectionMatrix(projectionMatrix)

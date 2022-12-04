@@ -109,7 +109,7 @@ abstract class Shader(shader: String) : Destroyable {
     }
 
     fun loadMatrix(name: String, matrix: Matrix4f) {
-        matrixBuffer = matrix[matrixBuffer]
+        matrixBuffer = matrix.get(matrixBuffer)
         glUniformMatrix4fv(getUniformLocation(name), false, matrixBuffer)
         matrixBuffer.clear()
     }

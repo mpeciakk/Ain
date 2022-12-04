@@ -1,12 +1,14 @@
-package ain.render
+package rp
 
 import mesh.Mesh
 import mesh.MeshBuilder
-import rp.RenderableState
+import org.joml.Matrix4f
 
 abstract class Renderable : MeshHolder {
     val meshes = mutableMapOf<String, Mesh>()
     val builders = mutableMapOf<String, MeshBuilder>()
+
+    var transformationMatrix: Matrix4f = Matrix4f().identity()
 
     var state = RenderableState.NONE
 

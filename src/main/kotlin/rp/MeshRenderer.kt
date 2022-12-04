@@ -1,7 +1,5 @@
 package rp
 
-import ain.render.Renderable
-
 class MeshRenderer<T : Renderable>(private val defaultRenderPipeline: RenderPipeline, private val renderPipelines: Map<String, RenderPipeline> = emptyMap()){
     fun render(t: T) {
         if (t.state == RenderableState.REQUESTED) {
@@ -25,9 +23,9 @@ class MeshRenderer<T : Renderable>(private val defaultRenderPipeline: RenderPipe
         if (t.state == RenderableState.READY) {
             for (mesh in t.meshes) {
                 if (renderPipelines.containsKey(mesh.key)) {
-                    renderPipelines[mesh.key]!!.render(mesh.value)
+                    renderPipelines[mesh.key]!!.render(t, mesh.value)
                 } else {
-                    defaultRenderPipeline.render(mesh.value)
+                    defaultRenderPipeline.render(t, mesh.value)
                 }
             }
         }
