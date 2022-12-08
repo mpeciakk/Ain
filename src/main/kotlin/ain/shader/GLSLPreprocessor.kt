@@ -1,4 +1,4 @@
-package shader
+package ain.shader
 
 // Yes, I made custom preprocessor for shaders, I am not mad, am I?
 class GLSLPreprocessor {

@@ -1,4 +1,4 @@
-package rp
+package ain.rp
 
 enum class RenderableState {
     NONE,

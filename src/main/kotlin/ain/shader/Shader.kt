@@ -1,6 +1,6 @@
-package shader
+package ain.shader
 
-import Destroyable
+import ain.Destroyable
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.joml.Vector3i

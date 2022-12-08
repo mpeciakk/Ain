@@ -1,7 +1,7 @@
-package rp
+package ain.rp
 
-import mesh.Mesh
-import mesh.MeshBuilder
+import ain.mesh.Mesh
+import ain.mesh.MeshBuilder
 import org.joml.Matrix4f
 
 abstract class Renderable : MeshHolder {

@@ -1,4 +1,4 @@
-package mesh
+package ain.mesh
 
 import org.lwjgl.opengl.GL15.*
 import java.nio.IntBuffer

@@ -1,4 +1,4 @@
-package mesh
+package ain.mesh
 
 class MeshBuilder {
     val vertices = mutableListOf<Vertex>()

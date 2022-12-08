@@ -1,4 +1,4 @@
-package rp
+package ain.rp
 
 class MeshRenderer<T : Renderable>(private val defaultRenderPipeline: RenderPipeline, private val renderPipelines: Map<String, RenderPipeline> = emptyMap()){
     fun render(t: T) {

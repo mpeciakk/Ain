@@ -1,6 +1,6 @@
-package mesh
+package ain.mesh
 
-import Destroyable
+import ain.Destroyable
 import org.lwjgl.opengl.GL30.*
 
 class Mesh : Destroyable {
